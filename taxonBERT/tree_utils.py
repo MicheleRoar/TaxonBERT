@@ -4,7 +4,7 @@ import pickle
 import pandas as pd
 import numpy as np
 from anytree import Node, RenderTree
-from taxonmatch.loader import load_gbif_dictionary, load_ncbi_dictionary
+from .loader import load_gbif_dictionary, load_ncbi_dictionary
 
 
 def find_node_by_name(tree, name):
