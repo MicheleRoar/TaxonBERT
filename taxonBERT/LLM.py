@@ -329,7 +329,7 @@ def find_matching_with_LLM(query_dataset, target_dataset, model, tokenizer, devi
     return (new_df_matched, df_unmatched)
 
 
-def match_dataset_with_LLM(query_dataset, target_dataset, model, tree_generation = False, gbif_dataset):
+def match_dataset_with_LLM(query_dataset, target_dataset, model, tree_generation = False):
     """
     Filters the matched dataset to identify and separate synonyms.
 
@@ -390,7 +390,7 @@ def match_dataset_with_LLM(query_dataset, target_dataset, model, tree_generation
 
     if not doubtful.empty:
         # Calculate Levenshtein distance for non-identical pairs
-        lev_dist = doubtful.apply(lambda row: txb.Levenshtein.distance(row['canonicalName'], row['ncbi_canonicalName']), axis=1)
+        lev_dist = doubtful.apply(lambda row: Levenshtein.distance(row['canonicalName'], row['ncbi_canonicalName']), axis=1)
 
         # Create a copy of the filtered DataFrame for non-identical pairs
         similar_pairs = doubtful.copy()
