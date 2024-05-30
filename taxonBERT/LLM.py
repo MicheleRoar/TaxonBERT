@@ -342,7 +342,7 @@ def match_dataset_with_LLM(query_dataset, target_dataset, model, tree_generation
 
     # Define columns of interest
     columns_of_interest = ['taxonID', 'parentNameUsageID', 'acceptedNameUsageID', 'canonicalName', 'taxonRank', 'taxonomicStatus', 'kingdom', 'phylum', 'class', 'order', 'family', 'genus']
-    gbif_full = pd.read_csv("./GBIF_output/Taxon.tsv", sep="\t", usecols=columns_of_interest, on_bad_lines='skip', low_memory=False)
+    gbif_dataset = pd.read_csv("./GBIF_output/Taxon.tsv", sep="\t", usecols=columns_of_interest, on_bad_lines='skip', low_memory=False)
 
     # Load GBIF dictionary
     gbif_synonyms_names, gbif_synonyms_ids, gbif_synonyms_ids_to_ids = get_gbif_synonyms(gbif_dataset)
