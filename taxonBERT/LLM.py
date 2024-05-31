@@ -349,7 +349,8 @@ def match_dataset_with_LLM(query_dataset, target_dataset, model, tokenizer, devi
     not_identical = df_matched.query("(canonicalName != ncbi_canonicalName) and taxonID != -1")
 
     # Filter rows where canonicalName is not identical to ncbi_canonicalName
-    only_ncbi = df_matched.query("(taxonID == -1) and ncbi_lineage_ranks != -1")
+    df_matched['ncbi_lineage_ranks'] = df_matched['ncbi_lineage_ranks'].astype(str)
+    only_ncbi = df_matched[(df_matched['taxonID'] == -1) & (df_matched['ncbi_lineage_ranks'] != '-1')]
 
     matching_synonims = []
     excluded_data = []
@@ -387,8 +388,6 @@ def match_dataset_with_LLM(query_dataset, target_dataset, model, tokenizer, devi
             excluded_data.append(row)
     """
 
-    excluded_data = [] #to remove
-
     # Converti le liste in DataFrame solo dopo il ciclo
     excluded_data_df = pd.DataFrame(excluded_data)
     doubtful = excluded_data_df.copy()
@@ -409,19 +408,28 @@ def match_dataset_with_LLM(query_dataset, target_dataset, model, tokenizer, devi
         ncbi_excluded = target_dataset[target_dataset.ncbi_id.isin(excluded_data_df.ncbi_id)]
     else:
         possible_typos_df = "No possible typos detected"
+        ncbi_excluded_list = []
+        gbif_excluded_list = []
+        ncbi_excluded = pd.DataFrame(ncbi_excluded_list)
+        gbif_excluded = pd.DataFrame(gbif_excluded_list)
 
 
     # Create separate DataFrame for included and excluded data
     df_matching_synonims = pd.DataFrame(matching_synonims).drop_duplicates()
-    df_matching_synonims.loc[:, 'ncbi_id'] = df_matching_synonims['ncbi_id'].astype(int)
+    if not df_matching_synonims.empty:
+      df_matching_synonims.loc[:, 'ncbi_id'] = df_matching_synonims['ncbi_id'].astype(int)
 
 
 
     # Assuming you have your sets defined
     iden = set(identical.ncbi_id)
 
-    # Filter out the excluded IDs from other DataFrames
-    ncbi_excluded_filtered = ncbi_excluded[~ncbi_excluded.ncbi_id.isin(iden)]
+    if not doubtful.empty:
+      # Filter out the excluded IDs from other DataFrames
+      ncbi_excluded_filtered = ncbi_excluded[~ncbi_excluded.ncbi_id.isin(iden)]
+    else:
+      ncbi_excluded_filtered_list = []
+      ncbi_excluded_filtered = pd.DataFrame(ncbi_excluded_filtered_list)
 
 
     if tree_generation and not doubtful.empty:

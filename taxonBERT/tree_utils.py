@@ -351,6 +351,8 @@ def convert_tree_to_dataframe(tree, query_dataset, target_dataset, path, index=F
     final_dataset = pd.merge(merged_df1, query_dataset, left_on=merged_df1['gbif_taxon_id'], right_on='taxonID', how='left')
     final_dataset_ = final_dataset.copy()
     
+    """
+
     # Load GBIF and NCBI dictionaries
     gbif_synonyms_names, gbif_synonyms_ids, gbif_synonyms_ids_to_ids = load_gbif_dictionary()
     ncbi_synonyms_names, ncbi_synonyms_ids = load_ncbi_dictionary()
@@ -359,14 +361,18 @@ def convert_tree_to_dataframe(tree, query_dataset, target_dataset, path, index=F
     final_dataset_['gbif_synonyms_names'] = final_dataset_['taxonID'].map(lambda x: '; '.join(map(str, gbif_synonyms_ids.get(x, []))))
     final_dataset_['gbif_synonyms_ids'] = final_dataset_['taxonID'].map(lambda x: '; '.join(map(str, gbif_synonyms_ids_to_ids.get(x, []))))
     final_dataset_['ncbi_synonyms_names'] = final_dataset_['ncbi_id'].map(lambda x: '; '.join(map(str, ncbi_synonyms_ids.get(x, []))))
+    """
+
     final_dataset_['id'] = range(1, len(final_dataset_) + 1)  # Assign a unique ID to each row
+
+    
     
     final_dataset_ = final_dataset_.infer_objects(copy=False).fillna(-1)
     final_dataset_ = final_dataset_.replace([-1, '-1', ""], None)
     
     # Select and rename columns
-    final_dataset_ = final_dataset_[["id", "Index", "ncbi_id", "gbif_taxon_id", "ncbi_canonicalName", "canonicalName", 'gbif_synonyms_ids', "gbif_synonyms_names", "ncbi_synonyms_names"]]
-    final_dataset_.columns = ["id", "path", "ncbi_taxon_id", "gbif_taxon_id", "ncbi_canonical_name", "gbif_canonical_name", "gbif_synonyms_ids", "gbif_synonyms_names", "ncbi_synonyms_names"]
+    final_dataset_ = final_dataset_[["id", "Index", "ncbi_id", "gbif_taxon_id", "ncbi_canonicalName", "canonicalName"]]
+    final_dataset_.columns = ["id", "path", "ncbi_taxon_id", "gbif_taxon_id", "ncbi_canonical_name", "gbif_canonical_name"]
     
     final_dataset_.to_csv(path, index=False)  # Save the final dataset to a CSV
     return final_dataset_
