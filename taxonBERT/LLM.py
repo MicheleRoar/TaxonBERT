@@ -329,7 +329,7 @@ def find_matching_with_LLM(query_dataset, target_dataset, model, tokenizer, devi
     return (new_df_matched, df_unmatched)
 
 
-def match_dataset_with_LLM(query_dataset, target_dataset, model, tree_generation = False):
+def match_dataset_with_LLM(query_dataset, target_dataset, model, tokenizer, tree_generation = False):
     """
     Filters the matched dataset to identify and separate synonyms.
 
