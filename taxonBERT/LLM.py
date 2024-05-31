@@ -340,16 +340,6 @@ def match_dataset_with_LLM(query_dataset, target_dataset, model, tree_generation
     tuple: DataFrames of filtered synonyms and unmatched entries.
     """
 
-    # Define columns of interest
-    columns_of_interest = ['taxonID', 'parentNameUsageID', 'acceptedNameUsageID', 'canonicalName', 'taxonRank', 'taxonomicStatus', 'kingdom', 'phylum', 'class', 'order', 'family', 'genus']
-    gbif_dataset = pd.read_csv("./GBIF_output/Taxon.tsv", sep="\t", usecols=columns_of_interest, on_bad_lines='skip', low_memory=False)
-
-    # Load GBIF dictionary
-    gbif_synonyms_names, gbif_synonyms_ids, gbif_synonyms_ids_to_ids = get_gbif_synonyms(gbif_dataset)
-
-    # Load NCBI dictionary
-    ncbi_synonyms_names, ncbi_synonyms_ids = get_ncbi_synonyms("./NCBI_output/names.dmp")
-
     df_matched, df_unmatched = find_matching_with_LLM(query_dataset, target_dataset, model, tokenizer, device, batch_size=16)
 
     # Filter rows where canonicalName is identical to ncbi_canonicalName
@@ -368,6 +358,18 @@ def match_dataset_with_LLM(query_dataset, target_dataset, model, tree_generation
     not_identical_ = not_identical.copy()
     not_identical_[['canonicalName', 'ncbi_canonicalName']] = not_identical_[['canonicalName', 'ncbi_canonicalName']].apply(lambda x: x.str.lower())
 
+    """
+
+    # Define columns of interest
+    columns_of_interest = ['taxonID', 'parentNameUsageID', 'acceptedNameUsageID', 'canonicalName', 'taxonRank', 'taxonomicStatus', 'kingdom', 'phylum', 'class', 'order', 'family', 'genus']
+    gbif_dataset = pd.read_csv("./GBIF_output/Taxon.tsv", sep="\t", usecols=columns_of_interest, on_bad_lines='skip', low_memory=False)
+
+    # Load GBIF dictionary
+    gbif_synonyms_names, gbif_synonyms_ids, gbif_synonyms_ids_to_ids = get_gbif_synonyms(gbif_dataset)
+
+    # Load NCBI dictionary
+    ncbi_synonyms_names, ncbi_synonyms_ids = get_ncbi_synonyms("./NCBI_output/names.dmp")
+
     gbif_synonyms_lower = {k.lower(): {v.lower() for v in vs} for k, vs in gbif_synonyms_names.items()}
     ncbi_synonyms_lower = {k.lower(): {v.lower() for v in vs} for k, vs in ncbi_synonyms_names.items()}
 
@@ -383,6 +385,9 @@ def match_dataset_with_LLM(query_dataset, target_dataset, model, tree_generation
             matching_synonims.append(row)
         else:
             excluded_data.append(row)
+    """
+
+    excluded_data = [] #to remove
 
     # Converti le liste in DataFrame solo dopo il ciclo
     excluded_data_df = pd.DataFrame(excluded_data)
