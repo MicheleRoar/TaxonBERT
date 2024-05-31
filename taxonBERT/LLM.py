@@ -289,10 +289,10 @@ def find_matching_with_LLM(query_dataset, target_dataset, model, tokenizer, devi
     """
     # Find nearest neighbors
 
-    query_list = list(query_dataset.gbif_taxonomy)
+    query_list = list(query_dataset.sample(100).gbif_taxonomy)
     target_list = list(target_dataset.ncbi_target_string)
 
-    matches = find_nearest_neighbors(query_list, target_list, n_neighbors=3, analyzer_func=ngrams)
+    matches = txb.find_nearest_neighbors(query_list, target_list, n_neighbors=3, analyzer_func=txb.ngrams)
 
     # Prepare data for the model
     data = matches
@@ -301,13 +301,13 @@ def find_matching_with_LLM(query_dataset, target_dataset, model, tokenizer, devi
     paired_strings = [f"{t1} [SEP] {t2}" for t1, t2 in zip(tax1, tax2)]
     
     # Create DataLoader
-    data_loader = create_data_loader(paired_strings, batch_size=batch_size)
+    data_loader = txb.create_data_loader(paired_strings, batch_size=16)
     
     # Make predictions
-    probabilities = make_predictions(model, data_loader, tokenizer, device)
+    probabilities = txb.make_predictions(model, data_loader, tokenizer, device)
     
     # Prepare and sort dataframe
-    filtered_df, rest_df = prepare_and_sort_dataframe(data, probabilities)
+    filtered_df, rest_df = txb.prepare_and_sort_dataframe(data, probabilities)
 
 
     df2 = target_dataset.merge(filtered_df, left_on='ncbi_target_string', right_on='Taxonomy2', how='inner')
@@ -318,11 +318,11 @@ def find_matching_with_LLM(query_dataset, target_dataset, model, tokenizer, devi
     discarded = list(initial.difference(matched))
 
     df_matched = df3.copy()
-    ncbi_matching = list(set(filtered_df.ncbi_id))
+    ncbi_matching = list(set(df_matched.ncbi_id))
     ncbi_missing = target_dataset[~target_dataset.ncbi_id.isin(ncbi_matching)]
     ncbi_missing_2 = ncbi_missing[['ncbi_id', 'ncbi_canonicalName', 'ncbi_target_string', 'ncbi_lineage_names', 'ncbi_lineage_ids']]
     ncbi_missing_3 = target_dataset[target_dataset['ncbi_canonicalName'].str.contains(r'\d')]
-    new_df_matched = pd.concat([filtered_df, ncbi_missing_2, ncbi_missing_3], ignore_index=True)
+    new_df_matched = pd.concat([df_matched, ncbi_missing_2, ncbi_missing_3], ignore_index=True)
     new_df_matched = new_df_matched.fillna(-1)
     df_unmatched = query_dataset[query_dataset["gbif_taxonomy"].isin(discarded)]
 
