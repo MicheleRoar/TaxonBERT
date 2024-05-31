@@ -292,7 +292,7 @@ def find_matching_with_LLM(query_dataset, target_dataset, model, tokenizer, devi
     query_list = list(query_dataset.sample(100).gbif_taxonomy)
     target_list = list(target_dataset.ncbi_target_string)
 
-    matches = txb.find_nearest_neighbors(query_list, target_list, n_neighbors=3, analyzer_func=txb.ngrams)
+    matches = find_nearest_neighbors(query_list, target_list, n_neighbors=3, analyzer_func=txb.ngrams)
 
     # Prepare data for the model
     data = matches
@@ -301,13 +301,13 @@ def find_matching_with_LLM(query_dataset, target_dataset, model, tokenizer, devi
     paired_strings = [f"{t1} [SEP] {t2}" for t1, t2 in zip(tax1, tax2)]
     
     # Create DataLoader
-    data_loader = txb.create_data_loader(paired_strings, batch_size=16)
+    data_loader = create_data_loader(paired_strings, batch_size=16)
     
     # Make predictions
-    probabilities = txb.make_predictions(model, data_loader, tokenizer, device)
+    probabilities = make_predictions(model, data_loader, tokenizer, device)
     
     # Prepare and sort dataframe
-    filtered_df, rest_df = txb.prepare_and_sort_dataframe(data, probabilities)
+    filtered_df, rest_df = prepare_and_sort_dataframe(data, probabilities)
 
 
     df2 = target_dataset.merge(filtered_df, left_on='ncbi_target_string', right_on='Taxonomy2', how='inner')
