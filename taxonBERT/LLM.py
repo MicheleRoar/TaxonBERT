@@ -289,10 +289,10 @@ def find_matching_with_LLM(query_dataset, target_dataset, model, tokenizer, devi
     """
     # Find nearest neighbors
 
-    query_list = list(query_dataset.sample(100).gbif_taxonomy)
+    query_list = list(query_dataset.gbif_taxonomy)
     target_list = list(target_dataset.ncbi_target_string)
 
-    matches = find_nearest_neighbors(query_list, target_list, n_neighbors=3, analyzer_func=txb.ngrams)
+    matches = find_nearest_neighbors(query_list, target_list, n_neighbors=3, analyzer_func=ngrams)
 
     # Prepare data for the model
     data = matches
@@ -301,7 +301,7 @@ def find_matching_with_LLM(query_dataset, target_dataset, model, tokenizer, devi
     paired_strings = [f"{t1} [SEP] {t2}" for t1, t2 in zip(tax1, tax2)]
     
     # Create DataLoader
-    data_loader = create_data_loader(paired_strings, batch_size=16)
+    data_loader = create_data_loader(paired_strings, batch_size=batch_size)
     
     # Make predictions
     probabilities = make_predictions(model, data_loader, tokenizer, device)
