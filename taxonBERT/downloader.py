@@ -344,7 +344,7 @@ def download_ncbi_taxonomy(output_folder=None):
         
         # Define target ranks and build target strings based on ranks
         #target_ranks = {'superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species'}
-        target_ranks = {'phylum', 'class', 'order', 'family', 'genus', 'species'}
+        target_ranks = {'phylum', 'class', 'order', 'family', 'genus', 'species', 'subspecies'}
         
         def build_target_string(names, ranks):
             names = names.split(';')
