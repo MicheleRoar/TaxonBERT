@@ -343,7 +343,8 @@ def download_ncbi_taxonomy(output_folder=None):
         nodes_df['ncbi_lineage_ranks'] = nodes_df['ncbi_lineage_ranks'].apply(lambda ranks: ';'.join(ranks))
         
         # Define target ranks and build target strings based on ranks
-        target_ranks = {'superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species'}
+        #target_ranks = {'superkingdom', 'phylum', 'class', 'order', 'family', 'genus', 'species'}
+        target_ranks = {'phylum', 'class', 'order', 'family', 'genus', 'species'}
         
         def build_target_string(names, ranks):
             names = names.split(';')
